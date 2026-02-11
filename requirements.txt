@@ -7,3 +7,4 @@ python-telegram-bot>=20.0
 web3
 fpdf
 psycopg2-binary
+beautifulsoup4
