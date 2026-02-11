@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANGUARD SAI-838 | TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+        body { background-color: #050505; color: #e5e5e5; font-family: 'Space Mono', monospace; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .audit-glow { box-shadow: 0 0 40px rgba(0, 82, 204, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-4xl w-full glass p-8 md:p-12 rounded-[40px] audit-glow">
+        <div class="flex justify-between items-start mb-12">
+            <div>
+                <h1 class="text-3xl font-black tracking-tighter uppercase leading-none">Vanguard <span class="text-blue-500 italic">SAI-838</span></h1>
+                <p class="text-[9px] text-zinc-500 tracking-[0.4em] uppercase mt-2">Institutional Audit Engine</p>
+            </div>
+            <div class="bg-blue-600/10 border border-blue-500/20 px-4 py-2 rounded-full">
+                <span class="text-[9px] font-bold text-blue-500 uppercase tracking-widest">Node: Active</span>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="relative">
+                <input id="targetInput" type="text" placeholder="ENTER TARGET ARCHITECTURE URL" 
+                       class="w-full bg-black/50 border border-white/10 p-5 rounded-2xl text-blue-400 outline-none focus:border-blue-500 transition-all text-sm">
+            </div>
+            <button onclick="executeAudit()" id="actionBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-3">
+                Initialize Deep Scan
+            </button>
+        </div>
+
+        <div id="console" class="mt-12 pt-8 border-t border-white/5 min-h-[100px] text-center">
+            <p class="text-zinc-600 text-[10px] uppercase tracking-widest" id="statusMsg">Awaiting Input Signal...</p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const API_BASE = window.location.origin;
+
+        async function executeAudit() {
+            const target = document.getElementById('targetInput').value;
+            const status = document.getElementById('statusMsg');
+            if(!target) return;
+
+            status.innerHTML = `<span class="animate-pulse text-blue-500">MAPPING LOGIC PATHWAYS...</span>`;
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/audit`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({target: target})
+                });
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    status.innerHTML = `
+                        <div class="text-left space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-red-500 font-bold text-xs uppercase">CRITICAL VULNERABILITY DETECTED</span>
+                                <span class="text-[10px] text-zinc-500">${data.id}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-black p-4 rounded-xl border border-white/5">
+                                    <span class="text-[8px] text-zinc-500 block">EXPOSURE</span>
+                                    <span class="text-lg font-bold">${data.analysis.estimated_loss}</span>
+                                </div>
+                                <div class="bg-black p-4 rounded-xl border border-white/5 text-yellow-500">
+                                    <span class="text-[8px] text-zinc-500 block">WINDOW</span>
+                                    <span class="text-lg font-bold">48 HOURS</span>
+                                </div>
+                            </div>
+                            <div class="text-[9px] text-zinc-400 bg-blue-500/5 p-4 rounded-xl border border-blue-500/10">
+                                REMEDIATION GATEWAY: <br>
+                                <span class="text-green-500 break-all font-bold">SOL: ${data.payment_gateways.sol}</span>
+                            </div>
+                        </div>
+                    `;
+                }, 2000);
+            } catch (e) {
+                status.innerHTML = `<span class="text-red-500">CONNECTION_FAILURE: CHECK RENDER LOGS</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
