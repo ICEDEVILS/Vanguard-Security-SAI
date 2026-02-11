@@ -3,3 +3,7 @@ flask-cors
 requests
 python-dotenv
 gunicorn
+python-telegram-bot>=20.0
+web3
+fpdf
+psycopg2-binary
