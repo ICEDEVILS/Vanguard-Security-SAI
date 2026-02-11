@@ -3,126 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANGUARD SAI-838 | WAR ROOM</title>
+    <title>VANGUARD SAI-838 | TERMINAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
-        body { background-color: #050505; color: #0066cc; font-family: 'Space Mono', monospace; }
-        .border-blue { border: 1px solid #0066cc; box-shadow: 0 0 15px rgba(0, 102, 204, 0.3); }
-        .blink { animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        body { background-color: #050505; color: #e5e5e5; font-family: 'Space Mono', monospace; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .audit-glow { box-shadow: 0 0 40px rgba(0, 82, 204, 0.1); }
     </style>
 </head>
-<body class="p-6 md:p-12">
-    <div class="max-w-6xl mx-auto">
-        <!-- HEADER -->
-        <div class="flex justify-between items-start mb-12 border-b border-blue-900 pb-6">
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-4xl w-full glass p-8 md:p-12 rounded-[40px] audit-glow">
+        <div class="flex justify-between items-start mb-12">
             <div>
-                <h1 class="text-4xl font-black tracking-tighter uppercase">Vanguard <span class="text-white">SAI-838</span></h1>
-                <p class="text-[10px] text-blue-500 tracking-[0.5em] uppercase mt-2">Institutional Audit Weapon System</p>
+                <h1 class="text-3xl font-black tracking-tighter uppercase leading-none">Vanguard <span class="text-blue-500 italic">SAI-838</span></h1>
+                <p class="text-[9px] text-zinc-500 tracking-[0.4em] uppercase mt-2">Institutional Audit Engine</p>
             </div>
-            <div class="text-right">
-                <p class="text-[10px] text-white">SYSTEM STATUS: <span class="text-green-500 blink">ACTIVE</span></p>
-                <p class="text-[10px] text-white">NODE: RENDER-GLOBAL-ALPHA</p>
+            <div class="bg-blue-600/10 border border-blue-500/20 px-4 py-2 rounded-full">
+                <span class="text-[9px] font-bold text-blue-500 uppercase tracking-widest">Node: Active</span>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- LEFT: SCANNER -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="border-blue p-6 bg-black/50">
-                    <h2 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Target Acquisition</h2>
-                    <input id="targetInput" type="text" placeholder="URL OR WALLET ADDR" 
-                           class="w-full bg-zinc-900 border border-blue-900 p-4 rounded text-sm text-white outline-none focus:border-blue-400 mb-4">
-                    <button onclick="executeScan()" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-4 text-xs uppercase tracking-widest transition-all">
-                        Execute Deep Scan
-                    </button>
-                    <div id="scanResult" class="mt-4 text-[10px] leading-relaxed"></div>
-                </div>
+        <div class="space-y-6">
+            <div class="relative">
+                <input id="targetInput" type="text" placeholder="ENTER TARGET ARCHITECTURE URL" 
+                       class="w-full bg-black/50 border border-white/10 p-5 rounded-2xl text-blue-400 outline-none focus:border-blue-500 transition-all text-sm">
             </div>
+            <button onclick="executeAudit()" id="actionBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-3">
+                Initialize Deep Scan
+            </button>
+        </div>
 
-            <!-- RIGHT: LIVE JOB MONITOR -->
-            <div class="lg:col-span-2">
-                <div class="border-blue p-6 bg-black/50 min-h-[500px]">
-                    <h2 class="text-white text-xs font-bold mb-6 uppercase tracking-widest">Live War Room Feed</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-[11px]">
-                            <thead>
-                                <tr class="text-blue-900 border-b border-blue-900 uppercase">
-                                    <th class="pb-3">Target Instance</th>
-                                    <th class="pb-3">Exposure</th>
-                                    <th class="pb-3">Status</th>
-                                    <th class="pb-3">Intel</th>
-                                    <th class="pb-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-blue-200">
-                                {% for job in jobs %}
-                                <tr class="border-b border-white/5 hover:bg-blue-900/10 transition-colors">
-                                    <td class="py-4 font-bold">{{ job[1] }}</td>
-                                    <td class="py-4 text-white">${{ job[2] }}</td>
-                                    <td class="py-4">
-                                        <span class="{{ 'text-green-500' if job[3] == 'FIXED' else 'text-red-500' }} font-bold">
-                                            {{ job[3] }}
-                                        </span>
-                                    </td>
-                                    <td class="py-4">
-                                        <a href="/static/{{ job[4] }}" target="_blank" class="bg-blue-900/30 border border-blue-500 px-2 py-1 hover:bg-blue-500 hover:text-white">PDF_REPORT</a>
-                                    </td>
-                                    <td class="py-4">
-                                        {% if job[3] == 'PENDING' %}
-                                        <button onclick="fixTarget('{{ job[1] }}')" class="bg-white text-black px-3 py-1 font-bold hover:bg-blue-400 transition-colors">REMEDIATE</button>
-                                        {% else %}
-                                        <span class="text-zinc-600">PATCHED</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div id="console" class="mt-12 pt-8 border-t border-white/5 min-h-[100px] text-center">
+            <p class="text-zinc-600 text-[10px] uppercase tracking-widest" id="statusMsg">Awaiting Input Signal...</p>
         </div>
     </div>
 
     <script>
-        async function executeScan() {
+        lucide.createIcons();
+        const API_BASE = window.location.origin;
+
+        async function executeAudit() {
             const target = document.getElementById('targetInput').value;
-            const resBox = document.getElementById('scanResult');
+            const status = document.getElementById('statusMsg');
             if(!target) return;
 
-            resBox.innerHTML = `<p class="text-blue-500 animate-pulse">INITIATING ENTROPY ANALYSIS...</p>`;
-
-            const response = await fetch('/api/audit', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({target})
-            });
-            const data = await response.json();
+            status.innerHTML = `<span class="animate-pulse text-blue-500">MAPPING LOGIC PATHWAYS...</span>`;
             
-            resBox.innerHTML = `
-                <div class="bg-blue-900/20 p-3 border border-blue-800">
-                    <p class="text-white">SCAN COMPLETE</p>
-                    <p>COST TO FIX: $${data.cost}</p>
-                    <p>INTEL: <a href="/static/${data.pdf}" class="underline text-blue-400">DOWNLOAD_VGD_REPORT</a></p>
-                    <p class="text-[8px] mt-2 text-zinc-500 italic">Job added to War Room monitor.</p>
-                </div>
-            `;
-            // Refresh feed after scan
-            setTimeout(() => location.reload(), 3000);
-        }
-
-        async function fixTarget(target) {
-            if(!confirm("Execute Remediation Sequence? This will patch all detected vulnerabilities.")) return;
-            
-            await fetch('/api/fix', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({target})
-            });
-            location.reload();
+            try {
+                const res = await fetch(`${API_BASE}/api/audit`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({target: target})
+                });
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    status.innerHTML = `
+                        <div class="text-left space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-red-500 font-bold text-xs uppercase">CRITICAL VULNERABILITY DETECTED</span>
+                                <span class="text-[10px] text-zinc-500">${data.id}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-black p-4 rounded-xl border border-white/5">
+                                    <span class="text-[8px] text-zinc-500 block">EXPOSURE</span>
+                                    <span class="text-lg font-bold">${data.analysis.estimated_loss}</span>
+                                </div>
+                                <div class="bg-black p-4 rounded-xl border border-white/5 text-yellow-500">
+                                    <span class="text-[8px] text-zinc-500 block">WINDOW</span>
+                                    <span class="text-lg font-bold">48 HOURS</span>
+                                </div>
+                            </div>
+                            <div class="text-[9px] text-zinc-400 bg-blue-500/5 p-4 rounded-xl border border-blue-500/10">
+                                REMEDIATION GATEWAY: <br>
+                                <span class="text-green-500 break-all font-bold">SOL: ${data.payment_gateways.sol}</span>
+                            </div>
+                        </div>
+                    `;
+                }, 2000);
+            } catch (e) {
+                status.innerHTML = `<span class="text-red-500">CONNECTION_FAILURE: CHECK RENDER LOGS</span>`;
+            }
         }
     </script>
 </body>
 </html>
+
+
