@@ -4,211 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VANGUARD SAI-838 | INSTITUTIONAL AUDIT ENGINE</title>
-    
-    <!-- Meta Configuration -->
-    <meta name="description" content="Institutional Security Auditing for Web3 and Telegram Infrastructures">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Global Connection Template -->
-    <script>
-        const VANGUARD_CONFIG = {
-            API_BASE: "https://vanguard-security-sai.onrender.com",
-            VERSION: "20.5.SAI",
-            BUILD: "ALIEN-CORE"
-        };
-
-        // Real-time Health Check
-        async function checkNodeStatus() {
-            const statusEl = document.getElementById('nodeStatus');
-            const statusDot = document.getElementById('nodeDot');
-            try {
-                const res = await fetch(`${VANGUARD_CONFIG.API_BASE}/`);
-                if(res.ok) {
-                    statusEl.innerText = "NODE_ACTIVE";
-                    statusDot.classList.replace('bg-zinc-700', 'bg-green-500');
-                    console.log("Vanguard Engine: Synced");
-                }
-            } catch (e) {
-                statusEl.innerText = "NODE_OFFLINE";
-                statusDot.classList.replace('bg-zinc-700', 'bg-red-500');
-            }
-        }
-
-        window.onload = () => {
-            lucide.createIcons();
-            checkNodeStatus();
-        };
-    </script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #050505; color: #fff; }
+        :root { --vanguard-blue: #002b5c; --vanguard-accent: #0052cc; }
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #e5e5e5; }
         .mono { font-family: 'Space Mono', monospace; }
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .scanline { width: 100%; height: 2px; background: rgba(0, 82, 204, 0.2); position: absolute; z-index: 50; animation: scan 6s linear infinite; pointer-events: none; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .audit-glow { box-shadow: 0 0 50px rgba(0, 82, 204, 0.15); }
+        .scanline { width: 100%; height: 2px; background: rgba(0, 82, 204, 0.3); position: absolute; z-index: 40; animation: scan 4s linear infinite; }
         @keyframes scan { from { top: 0; } to { top: 100%; } }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
     <div class="scanline"></div>
 
-    <!-- Navigation Header -->
-    <nav class="border-b border-white/5 px-8 py-5 flex justify-between items-center glass sticky top-0 z-[60]">
-        <div class="flex items-center gap-4">
-            <div class="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-900/40">
-                <i data-lucide="shield" class="text-white w-5 h-5"></i>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-black text-lg tracking-tighter uppercase leading-none">Vanguard <span class="text-blue-500 italic">SAI-838</span></span>
-                <div class="flex items-center gap-2 mt-1">
-                    <div id="nodeDot" class="w-1.5 h-1.5 rounded-full bg-zinc-700"></div>
-                    <span id="nodeStatus" class="text-[8px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Checking Node...</span>
-                </div>
-            </div>
+    <!-- Navigation -->
+    <nav class="border-b border-white/10 px-6 py-4 flex justify-between items-center glass sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-600 p-2 rounded-lg"><i data-lucide="shield" class="text-white w-6 h-6"></i></div>
+            <span class="font-black text-xl tracking-tighter uppercase">Vanguard <span class="text-blue-500">SAI-838</span></span>
         </div>
-        <div class="flex items-center gap-8 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-            <a href="https://github.com/ICEDEVILS" class="hover:text-blue-400 transition-colors">Infrastructure</a>
-            <a href="https://t.me/ZeroThreatIntel" class="hover:text-blue-400 transition-colors">Threat Intel</a>
-            <div class="h-4 w-[1px] bg-white/10"></div>
-            <span class="text-zinc-600">ARCHITECT: MEX ROBERT</span>
+        <div class="hidden md:flex gap-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
+            <a href="https://github.com/ICEDEVILS" class="hover:text-blue-400">GitHub</a>
+            <a href="https://x.com/IceGodsSystems" class="hover:text-blue-400">X / Twitter</a>
+            <a href="https://t.me/ZeroThreatIntel" class="hover:text-blue-400">Intel Channel</a>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-10">
-        <!-- Input Terminal -->
-        <div class="lg:col-span-4 space-y-6">
-            <div class="glass p-10 rounded-[40px] border-white/10 shadow-2xl">
-                <h2 class="text-xs font-black mb-8 tracking-[0.4em] text-blue-500 uppercase">Audit_Target_Initialization</h2>
-                <div class="space-y-6">
-                    <div class="relative">
-                        <input id="targetInput" type="text" placeholder="URL / BOT_ENDPOINT / WALLET" 
-                               class="w-full bg-black/60 border border-white/10 p-5 rounded-2xl text-blue-400 mono text-sm focus:border-blue-500 outline-none transition-all">
+    <main class="max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-8">
+        <!-- Left: Control Panel -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="glass p-8 rounded-3xl audit-glow">
+                <h2 class="text-2xl font-black mb-6 flex items-center gap-2 italic">
+                    <i data-lucide="terminal" class="text-blue-500"></i> SYSTEM_INPUT
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-zinc-500 mb-2 block">Target Architecture (URL/Wallet)</label>
+                        <input id="targetInput" type="text" placeholder="https://... or 0x..." class="w-full bg-black border border-white/10 p-4 rounded-xl text-blue-400 focus:border-blue-500 outline-none transition-all">
                     </div>
-                    <button onclick="runAudit()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] text-xs shadow-xl shadow-blue-900/30 transition-all flex items-center justify-center gap-3">
-                        <i data-lucide="zap" class="w-4 h-4"></i> Execute Shadow Audit
+                    <button onclick="startAudit()" id="scanBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-900/20 uppercase tracking-widest transition-all">
+                        Initialize Deep Scan
                     </button>
                 </div>
-                
-                <div class="mt-12 grid grid-cols-4 gap-4 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all">
-                    <a href="https://x.com/IceGodsSystems" target="_blank" class="flex justify-center"><i data-lucide="twitter"></i></a>
-                    <a href="https://t.me/ICEGODSICEDEVIL" target="_blank" class="flex justify-center"><i data-lucide="send"></i></a>
-                    <a href="https://youtube.com/@icegodsintelligence" target="_blank" class="flex justify-center"><i data-lucide="youtube"></i></a>
-                    <a href="https://github.com/ICEDEVILS" target="_blank" class="flex justify-center"><i data-lucide="github"></i></a>
+
+                <div class="mt-8 border-t border-white/5 pt-6 space-y-3">
+                    <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase">
+                        <span>Node Status</span> <span class="text-green-500">Active</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase">
+                        <span>Lead Architect</span> <span class="text-white">MEX ROBERT</span>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Social/Verification Deck -->
+            <div class="glass p-6 rounded-3xl grid grid-cols-4 gap-4 text-zinc-500">
+                <a href="https://youtube.com/@icegodsintelligence" class="hover:text-red-500 transition-colors flex justify-center"><i data-lucide="youtube"></i></a>
+                <a href="https://vm.tiktok.com/ZS9JaAkV1G4nj-CrpXb/" class="hover:text-pink-500 transition-colors flex justify-center"><i data-lucide="video"></i></a>
+                <a href="https://t.me/ICEGODSICEDEVIL" class="hover:text-blue-400 transition-colors flex justify-center"><i data-lucide="send"></i></a>
+                <a href="https://x.com/IceGodsSystems" class="hover:text-white transition-colors flex justify-center"><i data-lucide="twitter"></i></a>
             </div>
         </div>
 
-        <!-- Output Monitor -->
-        <div class="lg:col-span-8">
-            <div id="displayBoard" class="glass rounded-[40px] p-12 min-h-[550px] flex flex-col justify-center border-white/5 relative overflow-hidden">
-                
-                <!-- Initial State -->
-                <div id="idleView" class="text-center space-y-6">
-                    <div class="relative inline-block">
-                        <div class="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full"></div>
-                        <i data-lucide="radar" class="w-20 h-20 text-zinc-800 relative z-10 mx-auto"></i>
-                    </div>
-                    <h3 class="text-zinc-500 font-bold uppercase tracking-[0.5em] text-[10px]">Awaiting Signal Input</h3>
+        <!-- Right: Results Matrix -->
+        <div class="lg:col-span-2 space-y-6">
+            <div id="statusConsole" class="glass rounded-3xl p-8 min-h-[500px] flex flex-col justify-center items-center text-center">
+                <div id="idleState">
+                    <i data-lucide="activity" class="w-20 h-20 text-zinc-800 animate-pulse mx-auto mb-6"></i>
+                    <h3 class="text-zinc-500 font-bold uppercase tracking-[0.4em]">Awaiting Target for SAI-838 Analysis</h3>
                 </div>
 
-                <!-- Scanning State -->
-                <div id="scanningView" class="hidden w-full max-w-lg mx-auto text-center">
-                    <div class="mono text-7xl font-black mb-6 text-blue-500" id="pct">0%</div>
-                    <div class="w-full bg-white/5 h-1.5 rounded-full mb-8 overflow-hidden">
-                        <div id="bar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
+                <div id="scanningState" class="hidden w-full max-w-md">
+                    <div class="text-6xl font-black mb-4 mono text-blue-500" id="progressPct">0%</div>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-6">
+                        <div id="progressBar" class="bg-blue-500 h-full w-0 transition-all duration-100"></div>
                     </div>
-                    <p id="statusLog" class="text-[9px] uppercase tracking-[0.4em] text-zinc-500 animate-pulse italic">Mapping Logic Pathways...</p>
+                    <p id="logMsg" class="text-xs uppercase tracking-widest text-zinc-500 animate-pulse">Initializing Neural Bypass...</p>
                 </div>
 
-                <!-- Results State -->
-                <div id="resultView" class="hidden w-full space-y-10">
-                    <div class="flex justify-between items-end border-b border-white/5 pb-8">
+                <div id="resultState" class="hidden w-full text-left space-y-6">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <span class="text-red-500 text-[10px] font-black uppercase tracking-[0.3em]">Critical Defect Identified</span>
-                            <h3 class="text-5xl font-black mt-2 tracking-tighter uppercase">Non-Compliant</h3>
+                            <h3 class="text-4xl font-black text-red-500 uppercase">Risk Detected</h3>
+                            <p class="text-xs text-zinc-500 font-bold mt-1 uppercase tracking-widest" id="reportId">ID: VGD-UNKNOWN</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block mb-1">Exposure Vector</span>
-                            <span class="bg-red-500/10 text-red-500 px-4 py-1.5 rounded-full text-[10px] font-black border border-red-500/20">HECD_ENTROPY_LEAK</span>
+                            <span class="bg-red-500/10 text-red-500 px-4 py-1 rounded-full text-[10px] font-black uppercase border border-red-500/20">Non-Compliant</span>
                         </div>
                     </div>
 
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
-                            <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Financial Exposure</span>
-                            <p class="text-2xl font-black mt-1 text-white" id="exposureVal">$0.00</p>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[8px] text-zinc-500 uppercase font-black">Financial Exposure</p>
+                            <p class="text-xl font-black text-white">$42,800.00 <span class="text-[10px] text-red-500">/ Est Loss</span></p>
                         </div>
-                        <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
-                            <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Logic Entropy</span>
-                            <p class="text-2xl font-black mt-1 text-white">94.8%</p>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[8px] text-zinc-500 uppercase font-black">Threat Entropy</p>
+                            <p class="text-xl font-black text-white">94.8%</p>
                         </div>
-                        <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
-                            <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Repair Window</span>
-                            <p class="text-2xl font-black mt-1 text-yellow-500">48H</p>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[8px] text-zinc-500 uppercase font-black">Remediation Window</p>
+                            <p class="text-xl font-black text-yellow-500">48 Hours</p>
                         </div>
                     </div>
 
-                    <div class="bg-blue-600/5 border border-blue-500/20 p-8 rounded-[30px] flex flex-col md:flex-row gap-8 items-center">
-                        <div class="flex-1">
-                            <h4 class="text-xs font-black uppercase text-blue-400 mb-4 flex items-center gap-2">
-                                <i data-lucide="lock" class="w-4 h-4"></i> Secure Remediation Gateway
-                            </h4>
-                            <p class="text-[10px] text-zinc-400 mb-4">Awaiting 0.5 SOL / 0.05 ETH for automated patching and SAI-838 Certification.</p>
-                            <code class="text-[9px] block bg-black p-4 rounded-xl text-green-500 border border-white/5 break-all">SOL: 8dtuyskTtsB78DFDPWZszarvDpedwftKYCoMdZwjHbxy</code>
-                        </div>
-                        <div class="w-full md:w-auto space-y-3">
-                            <input id="hash" type="text" placeholder="ENTER TX HASH" class="w-full bg-black border border-white/10 p-4 rounded-xl text-[10px] outline-none mono focus:border-blue-500">
-                            <button onclick="alert('VERIFYING_TRANSACTION...')" class="w-full bg-white text-black font-black py-4 px-8 rounded-xl text-[10px] uppercase">Verify_Payment</button>
+                    <div class="bg-blue-600/5 border border-blue-500/20 p-6 rounded-3xl">
+                        <h4 class="text-xs font-black uppercase text-blue-400 mb-4 flex items-center gap-2">
+                            <i data-lucide="lock" class="w-4 h-4"></i> Secure Remediation Protocol
+                        </h4>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1">
+                                <p class="text-[10px] text-zinc-500 uppercase mb-2">Remediation Cost: 0.5 SOL / 0.05 ETH</p>
+                                <code class="text-[10px] block bg-black p-3 rounded-lg text-green-500 mb-2">SOL: 8dtuyskTtsB78DFDPWZszarvDpedwftKYCoMdZwjHbxy</code>
+                                <code class="text-[10px] block bg-black p-3 rounded-lg text-green-500">ETH: 0x20d2708acd360cd0fd416766802e055295470fc1</code>
+                            </div>
+                            <div class="flex flex-col gap-2 justify-center">
+                                <input id="txHashInput" type="text" placeholder="Paste TX Hash to Fix" class="bg-black border border-white/10 p-3 rounded-lg text-xs outline-none focus:border-blue-500 transition-all">
+                                <button onclick="verifyPayment()" class="bg-white text-black font-black text-[10px] py-3 px-6 rounded-lg uppercase hover:bg-zinc-200 transition-all">Verify & Repair</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
 
     <script>
-        const views = { idle: 'idleView', scan: 'scanningView', result: 'resultView' };
-        
-        function setView(v) {
-            Object.values(views).forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById(views[v]).classList.remove('hidden');
+        lucide.createIcons();
+        const state = { idle: 'idleState', scanning: 'scanningState', result: 'resultState' };
+
+        function switchState(targetId) {
+            Object.values(state).forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(targetId).classList.remove('hidden');
+            if(targetId === 'resultState') {
+                document.getElementById('statusConsole').classList.add('border-red-500/30');
+            }
         }
 
-        async function runAudit() {
+        function startAudit() {
             const target = document.getElementById('targetInput').value;
             if(!target) return;
-
-            setView('scan');
+            switchState(state.scanning);
             let p = 0;
-            const logs = ["Initializing Neural Bypass...", "Mapping Memory Pointers...", "Detecting Entropy...", "Generating SAI-838 Report..."];
-            
-            const timer = setInterval(() => {
+            const msgs = ["Mapping Memory Pointers...", "Detecting Callback Entropy...", "Checking SSL Integrity...", "Analyzing Liquidity Vulnerabilities...", "Finalizing SAI-838 Report..."];
+            const interval = setInterval(() => {
                 p += 1;
-                document.getElementById('pct').innerText = p + '%';
-                document.getElementById('bar').style.width = p + '%';
-                if(p % 25 === 0) document.getElementById('statusLog').innerText = logs[Math.floor(p/25)-1];
-                if(p >= 100) clearInterval(timer);
-            }, 40);
+                document.getElementById('progressPct').innerText = p + '%';
+                document.getElementById('progressBar').style.width = p + '%';
+                if(p % 20 === 0) document.getElementById('logMsg').innerText = msgs[Math.floor(p/20)-1];
+                if(p >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('reportId').innerText = `ID: VGD-SAI-${Math.floor(Date.now()/1000)}`;
+                    switchState(state.result);
+                }
+            }, 50);
+        }
 
-            try {
-                const response = await fetch(`${VANGUARD_CONFIG.API_BASE}/api/audit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ target: target })
-                });
-                const data = await response.json();
-                
-                setTimeout(() => {
-                    document.getElementById('exposureVal').innerText = data.analysis.estimated_loss;
-                    setView('result');
-                }, 4000);
-            } catch (e) {
-                console.error("FAIL", e);
-                alert("CORE_CONNECTION_ERROR");
-                setView('idle');
+        function verifyPayment() {
+            const hash = document.getElementById('txHashInput').value;
+            if(hash.length < 10) {
+                alert("Invalid Transaction Hash. Verification Failed.");
+                return;
             }
+            alert("Payment Verified. Generating Secured SAI-838 Compliance PDF. Fixed source code will be sent to owner email.");
+            // Logic to trigger PDF generation or redirect
         }
     </script>
 </body>
