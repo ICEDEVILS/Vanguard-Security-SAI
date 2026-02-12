@@ -8,3 +8,4 @@ web3
 fpdf
 psycopg2-binary
 beautifulsoup4
+
