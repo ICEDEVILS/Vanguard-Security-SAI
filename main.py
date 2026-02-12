@@ -13,33 +13,31 @@ load_dotenv()
 app = Flask(__name__)
 auditor = VanguardAuditor()
 
-# --- CONFIGURATION ---
+# --- CONFIG ---
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 DB_URL = os.getenv("DATABASE_URL")
-
-# Force Python-friendly URL and SSL
 if DB_URL and "postgres://" in DB_URL:
     DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
 
 def get_db():
-    # Use sslmode='require' for Supabase
+    # SSL is mandatory for Supabase Pooler (Port 6543)
     return psycopg2.connect(DB_URL, sslmode='require', connect_timeout=10)
 
-# --- TELEGRAM BOT LOGIC ---
+# --- BOT LOGIC ---
 async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🛡 **VANGUARD SAI-838 ONLINE.**\nSYSTEM IS ACTIVE. SEND TARGET.")
+    await update.message.reply_text("🛡 **VANGUARD SAI-838: ONLINE**\nWAR-ROOM LINKED. SEND TARGET URL OR WALLET.")
 
 async def handle_bot_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     target = update.message.text.strip()
-    wait_msg = await update.message.reply_text("🛰 **VANGUARD: ANALYZING...**")
+    wait_msg = await update.message.reply_text("🛰 **ANALYZING ARCHITECTURE...**")
 
     try:
-        # Run the audit engine
+        # Audit logic
         res = auditor.scan_website(target) if "." in target else auditor.scan_wallet(target)
         pdf_name = auditor.generate_report(res)
 
-        # Sync with Database (War Room)
-        db_status = "Sync Error"
+        # Log to Supabase
+        db_sync = "OFFLINE"
         try:
             conn = get_db()
             cur = conn.cursor()
@@ -47,19 +45,19 @@ async def handle_bot_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         (target, res['cost'], 'PENDING', pdf_name))
             conn.commit()
             cur.close(); conn.close()
-            db_status = "Intel Synced."
+            db_sync = "ONLINE"
         except Exception as e:
-            print(f"DB Sync Fail: {e}")
+            print(f"DB Sync Error: {e}")
 
         await update.message.reply_document(
             document=open(f"static/{pdf_name}", 'rb'), 
-            caption=f"✅ **INTEL CAPTURED**\nExposure: ${res['cost']}\nDB Status: {db_status}"
+            caption=f"✅ **INTEL CAPTURED**\nExposure: ${res['cost']}\nWar-Room: {db_sync}"
         )
         await wait_msg.delete()
     except Exception as e:
-        await update.message.reply_text(f"⚠️ SYSTEM ERROR: {str(e)}")
+        await update.message.reply_text(f"⚠️ SCAN ERROR: {str(e)}")
 
-# --- THE BOT THREAD (Fixed for PTB v20+) ---
+# --- ASYNC BOT THREAD ---
 def run_bot_worker():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -73,7 +71,7 @@ def run_bot_worker():
             await application.initialize()
             await application.start()
             await application.updater.start_polling(drop_pending_updates=True)
-            print("🤖 VANGUARD BOT POLLING STARTED...")
+            print("🤖 VANGUARD BOT: ACTIVE")
             while True:
                 await asyncio.sleep(1)
 
@@ -85,7 +83,6 @@ def index():
     try:
         conn = get_db()
         cur = conn.cursor()
-        # Initialize the War Room Table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS vanguard_jobs (
                 id SERIAL PRIMARY KEY,
@@ -101,7 +98,7 @@ def index():
         cur.close(); conn.close()
         return render_template('index.html', jobs=jobs)
     except Exception as e:
-        return f"<div style='background:black;color:red;padding:20px;font-family:monospace;'><h1>DB_CONNECTION_ERROR</h1><p>{str(e)}</p></div>"
+        return f"<body style='background:black;color:red;padding:20px;font-family:monospace;'><h1>DB_CONNECTION_FAILURE</h1><p>{str(e)}</p></body>"
 
 @app.route('/api/audit', methods=['POST'])
 def api_audit():
@@ -132,13 +129,8 @@ def api_fix():
     except: pass
     return jsonify({"status": "FIXED", "pdf": new_pdf})
 
-# --- SYSTEM INITIALIZER ---
 if __name__ == "__main__":
     if not os.path.exists('static'): os.makedirs('static')
-
-    # 1. Start Bot Intelligence in Background
     threading.Thread(target=run_bot_worker, daemon=True).start()
-
-    # 2. Start Web Terminal
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
